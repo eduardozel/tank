@@ -177,7 +177,7 @@ def regOtv():
     otv( cl1, rw4 )
     otv( cl2, rw4 )
     otv( cl3, rw4 )
-
+    winsound.Beep(freq, duration)
 # end def regOtv
 
 def otv1( offsetY, cLENGTH ):
@@ -233,6 +233,7 @@ def leftOtv():
     otv1( rw2, cSm)
     otv1( rw3, cBg)
     otv1( rw4, cSm)
+    winsound.Beep(freq, duration)
 # end def leftOtv
 
 def otv2( offsetX, offsetY, cLENGTH ):
@@ -291,7 +292,8 @@ def rightOtv():
     otv2( ofXb, rw2, cBg)
     otv2( ofXs, rw3, cSm)
     otv2( ofXb, rw4, cBg)
-# end def leftOtv
+    winsound.Beep(freq, duration)
+# end def rightOtv():
 
 def makePad():
     App.activeDocument().Body.newObject("PartDesign::Pad","Pad")
@@ -443,6 +445,35 @@ def PL4( ):
     ls40.EndPoint   = v04
     AD.addObject("Part::Feature","Line").Shape = ls40.toShape()
 # end PL4
+
+def facies( ):
+    fc0 = Part.makeFilledFace(Part.__sortEdges__([AD.Line001.Shape.Edge1, AD.Line002.Shape.Edge1, AD.Line003.Shape.Edge1, AD.Line004.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc0
+    Gui.SendMsgToActiveView("ViewFit")
+
+    fc1 = Part.makeFilledFace(Part.__sortEdges__([AD.Line002.Shape.Edge1, AD.Line005.Shape.Edge1, AD.Line006.Shape.Edge1, AD.Line007.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc1
+    Gui.SendMsgToActiveView("ViewFit")
+
+    fc2 =Part.makeFilledFace(Part.__sortEdges__([AD.Line003.Shape.Edge1, AD.Line007.Shape.Edge1, AD.Line008.Shape.Edge1, AD.Line009.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc2
+    Gui.SendMsgToActiveView("ViewFit")
+
+    fc3=Part.makeFilledFace(Part.__sortEdges__([AD.Line001.Shape.Edge1, AD.Line005.Shape.Edge1, AD.Line012.Shape.Edge1, AD.Line011.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc3
+    Gui.SendMsgToActiveView("ViewFit")
+    Gui.SendMsgToActiveView("ViewFit")
+
+    fc4=Part.makeFilledFace(Part.__sortEdges__([AD.Line004.Shape.Edge1, AD.Line011.Shape.Edge1, AD.Line010.Shape.Edge1, AD.Line009.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc4
+    Gui.SendMsgToActiveView("ViewFit")
+
+    fc5 =Part.makeFilledFace(Part.__sortEdges__([AD.Line012.Shape.Edge1, AD.Line006.Shape.Edge1, AD.Line008.Shape.Edge1, AD.Line010.Shape.Edge1, ]))
+    AD.addObject('Part::Feature','Face').Shape = fc5
+    Gui.SendMsgToActiveView("ViewFit")
+# end facies
+
+
 # =========================================
 
 duration = 1000  # millisecond
@@ -452,12 +483,9 @@ makeFORM()
 Gui.SendMsgToActiveView('ViewFit')
 winsound.Beep(freq, duration)
 #leftOtv()
-winsound.Beep(freq, duration)
 #os.system("pause")
 #regOtv()
-winsound.Beep(freq, duration)
-rightOtv()
-winsound.Beep(freq, duration)
+#rightOtv()
 makePad()
 winsound.Beep(freq, duration)
 time.sleep(5.5)
@@ -474,7 +502,6 @@ AD.addObject("Part::Feature","Line").Shape = ls0.toShape()
 
 PL0()
 Gui.SendMsgToActiveView("ViewFit")
-winsound.Beep(freq, duration)
 PL1()
 Gui.SendMsgToActiveView("ViewFit")winsound.Beep(freq, duration)
 #pPL2()
@@ -489,22 +516,18 @@ ls21.EndPoint   = v03
 AD.addObject("Part::Feature","Line").Shape = ls21.toShape()
 Gui.SendMsgToActiveView("ViewFit")
 Gui.activeDocument().activeView().viewAxonometric()
-winsound.Beep(freq, duration)
 PL3()
 Gui.SendMsgToActiveView("ViewFit")
-winsound.Beep(freq, duration)
 PL4()
 Gui.SendMsgToActiveView("ViewFit")
-winsound.Beep(freq, duration)
-P5()
-Gui.SendMsgToActiveView("ViewFit")
-winsound.Beep(freq, duration)
 
 AD.removeObject("Line")
 AD.recompute()
 Gui.SendMsgToActiveView("ViewFit")
 
 facies()
+
+Gui.activateWorkbench("PartWorkbench")
 
 sHH0=Part.Shell([AD.Face.Shape.Face1, AD.Face001.Shape.Face1, AD.Face002.Shape.Face1, AD.Face003.Shape.Face1, AD.Face004.Shape.Face1, AD.Face005.Shape.Face1, ])
 AD.addObject('Part::Feature','Shell').Shape=sHH0.removeSplitter()
@@ -526,3 +549,42 @@ Gui.activeDocument().Solid.Visibility=False
 Gui.ActiveDocument.Cut.ShapeColor=Gui.ActiveDocument.Body.ShapeColor
 Gui.ActiveDocument.Cut.DisplayMode=Gui.ActiveDocument.Body.DisplayMode
 App.ActiveDocument.recompute()
+
+__doc__=FreeCAD.getDocument("Tank")
+__doc__.addObject("Part::Mirroring")
+__doc__.ActiveObject.Source=__doc__.getObject("Solid")
+__doc__.ActiveObject.Label=u"Solid (Mirror #1)"
+__doc__.ActiveObject.Normal=(1,0,0)
+__doc__.ActiveObject.Base=(0,0,0)
+del __doc__
+Gui.ActiveDocument.ActiveObject.ShapeColor=Gui.ActiveDocument.Solid.ShapeColor
+Gui.ActiveDocument.ActiveObject.LineColor=Gui.ActiveDocument.Solid.LineColor
+Gui.ActiveDocument.ActiveObject.PointColor=Gui.ActiveDocument.Solid.PointColor
+Gui.ActiveDocument.setEdit('Part__Mirroring',0)
+FreeCAD.getDocument("Tank").getObject("Part__Mirroring").Placement = App.Placement(App.Vector(61.8,0,0),App.Rotation(App.Vector(0,0,1),0))
+
+App.activeDocument().addObject("Part::Cut","Cut001")
+App.activeDocument().Cut001.Base = App.activeDocument().Cut
+App.activeDocument().Cut001.Tool = App.activeDocument().Part__Mirroring
+Gui.activeDocument().Cut.Visibility=False
+Gui.activeDocument().Part__Mirroring.Visibility=False
+Gui.ActiveDocument.Cut001.ShapeColor=Gui.ActiveDocument.Cut.ShapeColor
+Gui.ActiveDocument.Cut001.DisplayMode=Gui.ActiveDocument.Cut.DisplayMode
+App.ActiveDocument.recompute()
+
+App.ActiveDocument.addObject("Part::Cylinder","Cylinder")
+App.ActiveDocument.Cylinder.Radius =0.80
+App.ActiveDocument.Cylinder.Height =14.80
+App.ActiveDocument.Cylinder.Angle  =360.
+App.ActiveDocument.Cylinder.Placement=Base.Placement(Base.Vector( 23.00, 32.00, 3.60), Base.Rotation(0.50,0.50,0.50,0.50) )
+App.ActiveDocument.Cylinder.Label='???????'
+ 
+App.activeDocument().addObject("Part::Cut","Cut002")
+App.activeDocument().Cut002.Base = App.activeDocument().Cut001
+App.activeDocument().Cut002.Tool = App.activeDocument().Cylinder
+Gui.activeDocument().Cut001.Visibility=False
+Gui.activeDocument().Cylinder.Visibility=False
+Gui.ActiveDocument.Cut002.ShapeColor=Gui.ActiveDocument.Cut001.ShapeColor
+Gui.ActiveDocument.Cut002.DisplayMode=Gui.ActiveDocument.Cut001.DisplayMode
+App.ActiveDocument.recompute()
+
